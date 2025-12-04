@@ -1,13 +1,15 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard page-container">
     <el-row :gutter="20">
       <!-- 统计卡片 -->
-      <el-col :span="6" v-for="stat in stats" :key="stat.title">
-        <el-card class="stat-card">
+      <el-col :xs="12" :sm="12" :md="6" :lg="6" v-for="stat in stats" :key="stat.title">
+        <el-card class="stat-card" shadow="hover">
           <div class="stat-content">
-            <el-icon :size="40" :color="stat.color">
-              <component :is="stat.icon" />
-            </el-icon>
+            <div class="stat-icon">
+              <el-icon :size="35" :color="stat.color">
+                <component :is="stat.icon" />
+              </el-icon>
+            </div>
             <div class="stat-info">
               <div class="stat-value">{{ stat.value }}</div>
               <div class="stat-title">{{ stat.title }}</div>
@@ -19,22 +21,22 @@
 
     <el-row :gutter="20" style="margin-top: 20px;">
       <!-- 难度分布 -->
-      <el-col :span="12">
-        <el-card>
+      <el-col :xs="24" :sm="24" :md="12" :lg="12">
+        <el-card shadow="hover">
           <template #header>
-            <span>题目难度分布</span>
+            <span>📊 题目难度分布</span>
           </template>
-          <div ref="difficultyChart" style="height: 300px;"></div>
+          <div ref="difficultyChart" style="height: 300px; width: 100%;"></div>
         </el-card>
       </el-col>
 
       <!-- 题型分布 -->
-      <el-col :span="12">
-        <el-card>
+      <el-col :xs="24" :sm="24" :md="12" :lg="12">
+        <el-card shadow="hover">
           <template #header>
-            <span>题目类型分布</span>
+            <span>📈 题目类型分布</span>
           </template>
-          <div ref="typeChart" style="height: 300px;"></div>
+          <div ref="typeChart" style="height: 300px; width: 100%;"></div>
         </el-card>
       </el-col>
     </el-row>
@@ -167,37 +169,52 @@ onMounted(() => {
 <style scoped>
 .dashboard {
   width: 100%;
+  max-width: 1200px;
 }
 
 .stat-card {
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
+  margin-bottom: 15px;
+  min-height: 100px;
 }
 
 .stat-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 15px;
+}
+
+.stat-icon {
+  flex-shrink: 0;
 }
 
 .stat-info {
   flex: 1;
+  text-align: right;
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: bold;
   color: #303133;
+  line-height: 1.2;
 }
 
 .stat-title {
   font-size: 14px;
   color: #909399;
-  margin-top: 5px;
+  margin-top: 8px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-title {
+    font-size: 12px;
+  }
 }
 </style>
 

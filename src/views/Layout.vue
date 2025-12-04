@@ -32,11 +32,7 @@
       </el-header>
 
       <el-main>
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" />
-          </transition>
-        </router-view>
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
@@ -141,16 +137,6 @@ const refresh = () => {
   padding: 20px;
   overflow-y: auto;
   height: calc(100vh - 60px);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
 

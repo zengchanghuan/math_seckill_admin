@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-page">
+  <div class="settings-page page-container">
     <el-row :gutter="20">
       <!-- 系统配置 -->
       <el-col :span="12">

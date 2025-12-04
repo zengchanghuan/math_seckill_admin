@@ -1,5 +1,5 @@
 <template>
-  <div class="pdf-import-page">
+  <div class="pdf-import-page page-container">
     <el-card>
       <template #header>
         <span>📄 PDF真题导入</span>
@@ -357,11 +357,11 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 <style scoped>
 .pdf-import-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  height: 100%;
-  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
 }
+
+/* PDF导入页面样式 - 与全局保持一致 */
 
 :deep(.el-upload-dragger) {
   padding: 40px 20px;
@@ -373,13 +373,27 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   margin-bottom: 12px;
 }
 
-/* 压缩使用指南高度 */
-:deep(.el-timeline-item__content) {
-  padding-bottom: 10px;
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-:deep(.el-card) {
-  margin-bottom: 15px;
+@media (max-width: 768px) {
+  :deep(.el-upload-dragger) {
+    padding: 30px 15px;
+  }
+
+  .el-icon--upload {
+    font-size: 40px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>
 

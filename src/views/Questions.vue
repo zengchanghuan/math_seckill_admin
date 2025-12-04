@@ -1,5 +1,5 @@
 <template>
-  <div class="questions-page">
+  <div class="questions-page page-container">
     <!-- 搜索栏 -->
     <el-card class="search-card">
       <el-form :inline="true">

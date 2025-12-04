@@ -1,5 +1,5 @@
 <template>
-  <div class="students-page">
+  <div class="students-page page-container">
     <!-- 学生选择 -->
     <el-card>
       <el-form :inline="true">

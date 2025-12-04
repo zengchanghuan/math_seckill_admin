@@ -1,5 +1,5 @@
 <template>
-  <div class="tutorials-page">
+  <div class="tutorials-page page-container">
     <!-- 主题和章节选择 -->
     <el-card class="selector-card">
       <el-form :inline="true">

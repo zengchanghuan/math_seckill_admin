@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css'
 import router from './router'
 import App from './App.vue'
 import './style.css'
+import './styles/global.css'
 
 const app = createApp(App)
 
