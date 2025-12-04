@@ -1,5 +1,10 @@
 <template>
   <div class="pdf-review-simple">
+    <!-- PDF文件信息 -->
+    <el-alert type="info" :closable="false" style="margin-bottom: 15px;">
+      <strong>📄 当前PDF：</strong>{{ pdfFileName }}
+    </el-alert>
+
     <!-- 顶部状态栏 -->
     <el-card class="status-card">
       <div class="status-info">
@@ -142,12 +147,17 @@ import { pdfAPI } from '../api'
 const questions = ref<any[]>([])
 const currentIndex = ref(0)
 const newTag = ref('')
+const pdfFileName = ref('')
 
 const currentQuestion = computed(() => questions.value[currentIndex.value])
 
 const loadData = () => {
   const saved = sessionStorage.getItem('pdfQuestions')
+  const fileName = sessionStorage.getItem('pdfFileName') || '未命名.pdf'
+  pdfFileName.value = fileName
+
   console.log('sessionStorage数据:', saved)
+  console.log('PDF文件名:', fileName)
 
   if (saved) {
     questions.value = JSON.parse(saved)
@@ -194,8 +204,10 @@ const createData = () => {
   ]
 
   sessionStorage.setItem('pdfQuestions', JSON.stringify(testData))
+  sessionStorage.setItem('pdfFileName', '测试数据.pdf')
   questions.value = testData
   currentIndex.value = 0
+  pdfFileName.value = '测试数据.pdf'
 
   ElMessage.success('测试数据已创建！')
 }

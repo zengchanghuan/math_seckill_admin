@@ -211,9 +211,15 @@ const processFile = async (file: File) => {
 
     // 保存结果（用于校验页面）
     const questionsData = questionsResult.questions || []
+    const fileName = file.name || '未命名.pdf'
+
     sessionStorage.setItem('pdfTaskId', taskId)
     sessionStorage.setItem('pdfQuestions', JSON.stringify(questionsData))
-    console.log('已保存到sessionStorage，题目数:', questionsData.length)
+    sessionStorage.setItem('pdfFileName', fileName)
+
+    console.log('[保存] 题目数:', questionsData.length)
+    console.log('[保存] 文件名:', fileName)
+    console.log('[验证] sessionStorage.pdfFileName =', sessionStorage.getItem('pdfFileName'))
 
     // 完成
     const questionCount = questionsData.length
@@ -295,6 +301,7 @@ const createMockData = () => {
   // 保存到sessionStorage
   sessionStorage.setItem('pdfTaskId', 'mock_' + Date.now())
   sessionStorage.setItem('pdfQuestions', jsonString)
+  sessionStorage.setItem('pdfFileName', '测试数据.pdf')
 
   // 验证保存
   const saved = sessionStorage.getItem('pdfQuestions')
