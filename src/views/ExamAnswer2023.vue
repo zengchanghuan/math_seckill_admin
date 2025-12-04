@@ -11,7 +11,7 @@
       <!-- 单项选择题 -->
       <div class="section">
         <h3 class="section-title">一、单项选择题（本大题共5小题，每小题3分，共15分。每小题只有一项符合题目要求）</h3>
-        
+
         <div v-for="q in choiceAnswers" :key="q.id" class="answer-item">
           <div class="question-number">{{ q.number }}.</div>
           <div class="answer-content">
@@ -41,7 +41,7 @@
       <!-- 填空题 -->
       <div class="section">
         <h3 class="section-title">二、填空题（本大题共 5 小题，每小题 3 分，共 15 分）</h3>
-        
+
         <div v-for="q in fillAnswers" :key="q.id" class="answer-item">
           <div class="question-number">{{ q.number }}.</div>
           <div class="answer-content">
@@ -66,7 +66,7 @@
       <!-- 计算题 -->
       <div class="section">
         <h3 class="section-title">三、计算题（本大题共8小题，每小题6分，共48分）</h3>
-        
+
         <div v-for="q in calcAnswers" :key="q.id" class="answer-item">
           <div class="question-number">{{ q.number }}.</div>
           <div class="answer-content">
@@ -87,7 +87,7 @@
       <!-- 综合题 -->
       <div class="section">
         <h3 class="section-title">四、综合题（本大题共2小题，第19小题10分，第20小题12分，共22分）</h3>
-        
+
         <div v-for="q in comprehensiveAnswers" :key="q.id" class="answer-item">
           <div class="question-number">{{ q.number }}.</div>
           <div class="answer-content">
