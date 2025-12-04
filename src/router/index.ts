@@ -49,7 +49,14 @@ const router = createRouter({
                     path: '/exam-paper',
                     name: 'exam-paper',
                     component: () => import('../views/ExamPaper.vue'),
-                    meta: { title: '2020广东专插本试卷', icon: 'Document' }
+                    meta: {
+                        title: '2020年广东专插本试卷',
+                        icon: 'Document',
+                        parent: '题库',
+                        parentGroup: '2020年',
+                        order: 2020,
+                        isPaper: true // 标记为试卷，直接显示
+                    }
                 },
                 {
                     path: '/settings',
