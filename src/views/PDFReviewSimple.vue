@@ -27,23 +27,66 @@
       </div>
     </el-card>
 
-    <!-- 题目内容 -->
-    <el-card v-if="currentQuestion" class="question-card" style="margin-top: 15px;">
-      <template #header>
-        <div class="card-header">
-          <span>📝 题目 {{ currentQuestion.questionNumber }}</span>
-          <el-radio-group v-model="currentQuestion.difficulty" size="small">
-            <el-radio-button label="L1">简单</el-radio-button>
-            <el-radio-button label="L2">中等</el-radio-button>
-            <el-radio-button label="L3">困难</el-radio-button>
-          </el-radio-group>
-        </div>
-      </template>
+    <!-- 左右对比：OCR原文 vs 编辑 -->
+    <el-row :gutter="15" v-if="currentQuestion" style="margin-top: 15px;">
+      <!-- 左侧：OCR原文 -->
+      <el-col :xs="24" :md="12">
+        <el-card shadow="hover">
+          <template #header>
+            <span>📄 OCR识别原文（仅供参考）</span>
+          </template>
+          <el-alert type="warning" :closable="false" style="margin-bottom: 10px;">
+            <strong>提示：</strong>OCR可能有错误，请对照右侧编辑框修正
+          </el-alert>
+          <div class="ocr-text">
+            {{ currentQuestion.ocrRawText || currentQuestion.rawText }}
+          </div>
+          <div v-if="currentQuestion.options" style="margin-top: 15px;">
+            <strong>OCR识别的选项：</strong>
+            <div v-for="(opt, idx) in currentQuestion.options" :key="idx" style="margin-top: 5px;">
+              <el-tag>{{ opt.letter }}</el-tag> {{ opt.content }}
+            </div>
+          </div>
+        </el-card>
+      </el-col>
 
-      <el-form label-width="80px">
-        <el-form-item label="题目内容">
-          <el-input v-model="currentQuestion.rawText" type="textarea" :rows="3" />
-        </el-form-item>
+      <!-- 右侧：编辑表单 -->
+      <el-col :xs="24" :md="12">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span>✏️ 编辑题目 {{ currentQuestion.questionNumber }}</span>
+              <el-radio-group v-model="currentQuestion.difficulty" size="small">
+                <el-radio-button label="L1">简单</el-radio-button>
+                <el-radio-button label="L2">中等</el-radio-button>
+                <el-radio-button label="L3">困难</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+
+          <el-form label-width="90px" size="small">
+            <el-form-item label="题目内容">
+              <el-input
+                v-model="currentQuestion.rawText"
+                type="textarea"
+                :rows="3"
+                placeholder="修正OCR错误，数学公式用LaTeX：$...$"
+              />
+            </el-form-item>
+
+            <!-- LaTeX快捷按钮 -->
+            <el-form-item label="快捷输入">
+              <el-space wrap>
+                <el-button size="small" @click="insertLatex('\\sin')">sin</el-button>
+                <el-button size="small" @click="insertLatex('\\cos')">cos</el-button>
+                <el-button size="small" @click="insertLatex('\\lim')">lim</el-button>
+                <el-button size="small" @click="insertLatex('\\frac{}{}')">分数</el-button>
+                <el-button size="small" @click="insertLatex('\\sqrt{}')">根号</el-button>
+                <el-button size="small" @click="insertLatex('\\int')">积分</el-button>
+                <el-button size="small" @click="insertLatex('^{}')">上标</el-button>
+                <el-button size="small" @click="insertLatex('_{}')">下标</el-button>
+              </el-space>
+            </el-form-item>
 
         <el-form-item label="选项" v-if="currentQuestion.options">
           <div v-for="(opt, idx) in currentQuestion.options" :key="idx" style="margin-bottom: 10px;">
@@ -82,8 +125,10 @@
             </template>
           </el-input>
         </el-form-item>
-      </el-form>
-    </el-card>
+          </el-form>
+        </el-card>
+      </el-col>
+    </el-row>
 
     <!-- 操作按钮 -->
     <el-card v-if="questions.length > 0" style="margin-top: 15px;">
@@ -172,6 +217,7 @@ const createData = () => {
     {
       questionNumber: 1,
       rawText: '计算：$\\sin(30^\\circ) = ?$',
+      ocrRawText: '. té lim[ cosx - f(x)]=1, WY Sal a at',  // 模拟OCR原文
       options: [
         { letter: 'A', content: '$\\frac{1}{2}$' },
         { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
@@ -188,6 +234,7 @@ const createData = () => {
     {
       questionNumber: 2,
       rawText: '计算：$\\cos(45^\\circ) = ?$',
+      ocrRawText: '2. Calc: cos(45 degrees) = ?',  // 模拟OCR原文
       options: [
         { letter: 'A', content: '$\\frac{1}{2}$' },
         { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
@@ -209,7 +256,7 @@ const createData = () => {
   currentIndex.value = 0
   pdfFileName.value = '测试数据.pdf'
 
-  ElMessage.success('测试数据已创建！')
+  ElMessage.success('测试数据已创建！左侧显示OCR原文，右侧快速修正')
 }
 
 const previousQuestion = () => {
@@ -261,6 +308,16 @@ const addTag = () => {
   }
 }
 
+// LaTeX快捷插入
+const insertLatex = (latex: string) => {
+  if (currentQuestion.value) {
+    const current = currentQuestion.value.rawText || ''
+    // 插入到末尾，用户可以移动位置
+    currentQuestion.value.rawText = current + ' $' + latex + '$'
+    ElMessage.success('已插入：' + latex)
+  }
+}
+
 // 自动加载
 loadData()
 </script>
@@ -298,6 +355,19 @@ loadData()
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.ocr-text {
+  background: #f5f7fa;
+  padding: 15px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 /* 响应式布局 */
