@@ -59,6 +59,19 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/exam-answer-2020',
+                    name: 'exam-answer-2020',
+                    component: () => import('../views/ExamAnswer2020.vue'),
+                    meta: {
+                        title: '2020年广东专插本答案',
+                        icon: 'Tickets',
+                        parent: '题库',
+                        parentGroup: '2020年',
+                        order: 2020,
+                        isAnswer: true // 标记为答案，直接显示
+                    }
+                },
+                {
                     path: '/settings',
                     name: 'settings',
                     component: () => import('../views/Settings.vue'),

@@ -151,34 +151,15 @@ const menuTree = computed(() => {
           parentItem.children!.push(groupItem)
         }
 
-        // 如果是试卷，直接添加到年份下
-        if (meta?.isPaper) {
+        // 如果是试卷或答案，直接添加到年份下
+        if (meta?.isPaper || meta?.isAnswer) {
           groupItem.children!.push({
             title: meta.title,
             icon: meta.icon,
             path: route.path
           })
         }
-        // 如果是答案，添加到"答案"子目录
-        else if (meta?.subGroup === '答案') {
-          let answerGroup = groupItem.children?.find(c => c.title === '答案')
-
-          if (!answerGroup) {
-            answerGroup = {
-              title: '答案',
-              icon: 'Tickets',
-              children: []
-            }
-            groupItem.children!.push(answerGroup)
-          }
-
-          answerGroup.children!.push({
-            title: meta.title,
-            icon: meta.icon,
-            path: route.path
-          })
-        }
-        // 其他情况，直接添加到年份下
+        // 其他情况，也直接添加到年份下
         else {
           groupItem.children!.push({
             title: meta.title,
@@ -207,31 +188,6 @@ const menuTree = computed(() => {
   // 对题库下的年份进行排序（按年份降序，最新的在上面）
   tree.forEach(parent => {
     if (parent.title === '题库' && parent.children) {
-      parent.children.sort((a, b) => (b.order || 0) - (a.order || 0))
-
-      // 为每个年份确保有答案目录（如果需要）
-      parent.children.forEach(yearItem => {
-        if (!yearItem.children) {
-          yearItem.children = []
-        }
-
-        // 确保答案目录存在（只有当还没有答案子目录时）
-        if (!yearItem.children.find(c => c.title === '答案')) {
-          yearItem.children.push({
-            title: '答案',
-            icon: 'Tickets',
-            children: []
-          })
-        }
-
-        // 对子项排序：试卷文件在前，答案目录在最后
-        yearItem.children.sort((a, b) => {
-          if (a.title === '答案') return 1
-          if (b.title === '答案') return -1
-          return 0
-        })
-      })
-
       // 为缺失的年份自动创建空目录
       years.forEach((year, index) => {
         if (!parent.children!.find(c => c.title === year)) {
@@ -240,18 +196,12 @@ const menuTree = computed(() => {
             title: year,
             icon: 'Calendar',
             order: yearOrder,
-            children: [
-              {
-                title: '答案',
-                icon: 'Tickets',
-                children: []
-              }
-            ]
+            children: []
           })
         }
       })
 
-      // 再次排序确保年份顺序正确
+      // 排序确保年份顺序正确
       parent.children.sort((a, b) => (b.order || 0) - (a.order || 0))
     }
   })
