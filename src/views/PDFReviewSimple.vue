@@ -19,6 +19,10 @@
             <el-icon><Refresh /></el-icon>
             重新加载
           </el-button>
+          <el-button type="primary" @click="loadRealPDFData" size="small">
+            <el-icon><Document /></el-icon>
+            加载真实PDF数据
+          </el-button>
           <el-button type="success" @click="createData" size="small">
             <el-icon><MagicStick /></el-icon>
             创建测试数据
@@ -185,7 +189,8 @@ import {
   MagicStick,
   ArrowLeft,
   ArrowRight,
-  Check
+  Check,
+  Document
 } from '@element-plus/icons-vue'
 import { pdfAPI } from '../api'
 
@@ -316,6 +321,45 @@ const insertLatex = (latex: string) => {
     currentQuestion.value.rawText = current + ' $' + latex + '$'
     ElMessage.success('已插入：' + latex)
   }
+}
+
+// 加载真实PDF数据（从智能识别结果）
+const loadRealPDFData = () => {
+  // 从智能识别结果加载
+  const realQuestions = [
+    {
+      questionNumber: 1,
+      rawText: "",  // 待用户修正
+      ocrRawText: `一、单项选择题（本大题共5小题，每小题3分，共15分）
+
+第1题：té lim[cosx - f(x)]=1（OCR识别有误）
+
+A. lim f(x)=1
+B. lim f(x)cos.x =|
+C. lim f(x)=-1
+D. lim[f(x)+cosx]=1`,
+      options: [
+        { letter: 'A', content: 'lim f(x)=1' },
+        { letter: 'B', content: 'lim f(x)cos.x =1' },
+        { letter: 'C', content: 'lim f(x)=-1' },
+        { letter: 'D', content: 'lim[f(x)+cosx]=1' }
+      ],
+      answer: '',
+      type: 'choice',
+      difficulty: 'L2',
+      knowledgePoints: ['极限', '三角函数'],
+      solution: '',
+      topic: '高等数学'
+    }
+  ]
+
+  sessionStorage.setItem('pdfQuestions', JSON.stringify(realQuestions))
+  sessionStorage.setItem('pdfFileName', '2020年广东专插本考试《高等数学》试题.pdf')
+  questions.value = realQuestions
+  currentIndex.value = 0
+  pdfFileName.value = '2020年广东专插本考试《高等数学》试题.pdf'
+
+  ElMessage.success('真实PDF数据已加载！OCR识别的选项已预填，请修正公式')
 }
 
 // 自动加载
