@@ -97,6 +97,32 @@ const router = createRouter({
                         isAnswer: true
                     }
                 },
+        {
+          path: '/exam-paper-2023',
+          name: 'exam-paper-2023',
+          component: () => import('../views/ExamPaper2023.vue'),
+          meta: { 
+            title: '2023年广东专升本试卷', 
+            icon: 'Document',
+            parent: '题库',
+            parentGroup: '2023年',
+            order: 2023,
+            isPaper: true
+          }
+        },
+        {
+          path: '/exam-answer-2023',
+          name: 'exam-answer-2023',
+          component: () => import('../views/ExamAnswer2023.vue'),
+          meta: { 
+            title: '2023年广东专升本答案', 
+            icon: 'Tickets',
+            parent: '题库',
+            parentGroup: '2023年',
+            order: 2023,
+            isAnswer: true
+          }
+        },
                 {
                     path: '/settings',
                     name: 'settings',
