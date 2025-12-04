@@ -31,8 +31,8 @@
               {{ profile.totalAnswered }}
             </el-descriptions-item>
             <el-descriptions-item label="正确率">
-              <el-progress 
-                :percentage="profile.overallAccuracy * 100" 
+              <el-progress
+                :percentage="profile.overallAccuracy * 100"
                 :color="getAccuracyColor(profile.overallAccuracy)"
               />
             </el-descriptions-item>
@@ -40,8 +40,8 @@
               {{ profile.avgTimeSeconds?.toFixed(1) }} 秒
             </el-descriptions-item>
             <el-descriptions-item label="学习偏好">
-              <el-tag 
-                v-for="topic in profile.preferredTopics" 
+              <el-tag
+                v-for="topic in profile.preferredTopics"
                 :key="topic"
                 style="margin-right: 5px;"
               >
@@ -59,14 +59,14 @@
             <span>📊 知识点掌握度</span>
           </template>
           <div v-if="profile && profile.knowledgeMastery">
-            <div 
-              v-for="(score, topic) in profile.knowledgeMastery" 
+            <div
+              v-for="(score, topic) in profile.knowledgeMastery"
               :key="topic"
               class="mastery-item"
             >
               <span class="mastery-label">{{ topic }}</span>
-              <el-progress 
-                :percentage="score * 100" 
+              <el-progress
+                :percentage="score * 100"
                 :color="getMasteryColor(score)"
               />
             </div>
@@ -81,16 +81,16 @@
       <template #header>
         <span>📝 答题记录（最近{{ answerRecords.length }}条）</span>
       </template>
-      
+
       <el-table :data="answerRecords" stripe>
         <el-table-column type="index" label="#" width="60" />
         <el-table-column prop="questionId" label="题目ID" width="150" />
         <el-table-column label="题目" min-width="200">
           <template #default="{ row }">
             <div v-if="row.questionContent">
-              <MathFormula 
-                v-if="hasLatex(row.questionContent)" 
-                :formula="extractLatex(row.questionContent)" 
+              <MathFormula
+                v-if="hasLatex(row.questionContent)"
+                :formula="extractLatex(row.questionContent)"
               />
               <span v-else>{{ row.questionContent }}</span>
             </div>

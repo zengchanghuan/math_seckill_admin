@@ -73,5 +73,28 @@ export const configAPI = {
   getVersion: () => api.get('/api/config/version')
 }
 
+export const pdfAPI = {
+  // 上传PDF
+  upload: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/api/pdf/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000
+    })
+  },
+
+  // 处理PDF
+  process: (taskId: string) => api.post(`/api/pdf/process/${taskId}`, {}, {
+    timeout: 300000  // 5分钟超时
+  }),
+
+  // 获取处理后的题目
+  getQuestions: (taskId: string) => api.get(`/api/pdf/questions/${taskId}`),
+
+  // 校验并保存题目
+  verifyQuestion: (question: any) => api.post('/api/pdf/verify', question)
+}
+
 export default api
 

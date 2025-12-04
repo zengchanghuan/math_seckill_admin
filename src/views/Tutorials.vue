@@ -12,11 +12,11 @@
         </el-form-item>
         <el-form-item label="章节">
           <el-select v-model="selectedChapter" @change="loadChapterContent" style="width: 200px;">
-            <el-option 
-              v-for="(chapter, idx) in chapters" 
+            <el-option
+              v-for="(chapter, idx) in chapters"
               :key="idx"
-              :label="chapter" 
-              :value="chapter" 
+              :label="chapter"
+              :value="chapter"
             />
           </el-select>
         </el-form-item>
@@ -175,8 +175,8 @@
             <div v-if="chapterData.chapterSummary.formulaSheet">
               <h4>公式速查表：</h4>
               <el-collapse>
-                <el-collapse-item 
-                  v-for="(formulas, key) in chapterData.chapterSummary.formulaSheet" 
+                <el-collapse-item
+                  v-for="(formulas, key) in chapterData.chapterSummary.formulaSheet"
                   :key="key"
                   :title="key"
                 >

@@ -34,6 +34,18 @@ const router = createRouter({
           meta: { title: '学生数据', icon: 'User' }
         },
         {
+          path: '/pdf-import',
+          name: 'pdf-import',
+          component: () => import('../views/PDFImport.vue'),
+          meta: { title: 'PDF导入', icon: 'Upload' }
+        },
+        {
+          path: '/pdf-review',
+          name: 'pdf-review',
+          component: () => import('../views/PDFReview.vue'),
+          meta: { title: 'PDF校验', icon: 'View', hidden: true }
+        },
+        {
           path: '/settings',
           name: 'settings',
           component: () => import('../views/Settings.vue'),
