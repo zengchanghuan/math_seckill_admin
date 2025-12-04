@@ -52,7 +52,9 @@ const router = useRouter()
 
 const menuRoutes = computed(() => {
   const layoutRoute = router.getRoutes().find(r => r.name === 'layout')
-  return layoutRoute?.children || []
+  const routes = layoutRoute?.children || []
+  console.log('[菜单] 所有子路由:', routes.map(r => ({path: r.path, title: r.meta?.title, hidden: r.meta?.hidden})))
+  return routes
 })
 
 const activeMenu = computed(() => route.path)
@@ -137,6 +139,8 @@ const refresh = () => {
 .el-main {
   background: #f0f2f5;
   padding: 20px;
+  overflow-y: auto;
+  height: calc(100vh - 60px);
 }
 
 .fade-enter-active,

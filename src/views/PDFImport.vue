@@ -76,49 +76,78 @@
       </el-card>
     </el-card>
 
-    <!-- 快速指南 -->
-    <el-card style="margin-top: 20px;">
-      <template #header>
-        <span>📖 使用指南</span>
-      </template>
+    <!-- 快速操作和帮助 -->
+    <el-card style="margin-top: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <el-button type="info" @click="createMockData">
+          <el-icon><MagicStick /></el-icon>
+          创建测试数据（体验校验流程）
+        </el-button>
 
-      <el-timeline>
-        <el-timeline-item timestamp="步骤 1" placement="top">
-          <h4>准备PDF文件</h4>
-          <p>确保PDF清晰，题号格式规范（1. 2. 3.或(1) (2) (3)）</p>
-        </el-timeline-item>
-        <el-timeline-item timestamp="步骤 2" placement="top">
-          <h4>上传并处理</h4>
-          <p>上传PDF后，系统自动进行页面提取、OCR识别、题目切分</p>
-        </el-timeline-item>
-        <el-timeline-item timestamp="步骤 3" placement="top">
-          <h4>人工校验</h4>
-          <p>左右对比界面，修正OCR错误，添加LaTeX公式，设置知识点标签</p>
-        </el-timeline-item>
-        <el-timeline-item timestamp="步骤 4" placement="top">
-          <h4>保存入库</h4>
-          <p>校验完成的题目自动保存到题库</p>
-        </el-timeline-item>
-      </el-timeline>
+        <el-button @click="helpDialogVisible = true">
+          <el-icon><QuestionFilled /></el-icon>
+          查看使用指南
+        </el-button>
+      </div>
+    </el-card>
 
-      <el-alert type="warning" :closable="false" style="margin-top: 15px;">
+    <!-- 使用指南对话框 -->
+    <el-dialog
+      v-model="helpDialogVisible"
+      title="📖 PDF真题录入使用指南"
+      width="700px"
+    >
+      <el-steps :active="4" direction="vertical">
+        <el-step title="准备PDF文件">
+          <template #description>
+            确保PDF清晰，题号格式规范（1. 2. 3. 或 (1) (2) (3)）
+          </template>
+        </el-step>
+        <el-step title="上传并处理">
+          <template #description>
+            拖拽或点击上传PDF，系统自动进行页面提取、OCR识别、题目切分（约5-10分钟）
+          </template>
+        </el-step>
+        <el-step title="人工校验">
+          <template #description>
+            左右对比界面，修正OCR错误，添加LaTeX公式，设置知识点标签（约2-3分钟/题）
+          </template>
+        </el-step>
+        <el-step title="保存入库">
+          <template #description>
+            校验完成的题目自动保存到题库，可在"题目管理"中查看
+          </template>
+        </el-step>
+      </el-steps>
+
+      <el-alert type="warning" :closable="false" style="margin-top: 20px;">
         <template #title>
           ⚠️ 注意事项
         </template>
         <ul style="margin: 10px 0; padding-left: 20px;">
-          <li>数学公式需要人工转换为LaTeX格式</li>
+          <li>数学公式需要人工转换为LaTeX格式（如：\sin(30^\circ) = \frac{1}{2}）</li>
           <li>图表会单独保存为图片文件</li>
-          <li>建议先用简单PDF测试流程</li>
+          <li>建议先用"创建测试数据"体验流程</li>
+          <li>支持的题号格式：1. 2. 3. 或 (1) (2) (3)</li>
         </ul>
       </el-alert>
-    </el-card>
+
+      <el-alert type="success" :closable="false" style="margin-top: 15px;">
+        <template #title>
+          💡 效率提升
+        </template>
+        <p>传统手工录入：10-15分钟/题</p>
+        <p>使用本系统：2-3分钟/题</p>
+        <p><strong>效率提升：5-7倍！</strong></p>
+      </el-alert>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { UploadFilled, View } from '@element-plus/icons-vue'
+import { UploadFilled, View, MagicStick, QuestionFilled } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { pdfAPI } from '../api'
 
@@ -130,6 +159,7 @@ const currentStep = ref(0)
 const progress = ref(0)
 const progressText = ref('')
 const result = ref<any>(null)
+const helpDialogVisible = ref(false)
 
 const handleFileChange = (file: any) => {
   console.log('选择文件:', file.name)
@@ -151,6 +181,7 @@ const processFile = async (file: File) => {
     progress.value = 10
 
     const uploadResult = await pdfAPI.upload(file)
+    console.log('上传结果:', uploadResult)
     const taskId = uploadResult.taskId
 
     progress.value = 25
@@ -159,6 +190,7 @@ const processFile = async (file: File) => {
 
     // 步骤2：处理PDF（提取、OCR、切分）
     const processResult = await pdfAPI.process(taskId)
+    console.log('处理结果:', processResult)
 
     progress.value = 50
     currentStep.value = 3
@@ -172,29 +204,111 @@ const processFile = async (file: File) => {
 
     // 获取处理后的题目
     const questionsResult = await pdfAPI.getQuestions(taskId)
+    console.log('题目结果:', questionsResult)
+    console.log('题目数量:', questionsResult.questions?.length)
 
     progress.value = 100
 
     // 保存结果（用于校验页面）
+    const questionsData = questionsResult.questions || []
     sessionStorage.setItem('pdfTaskId', taskId)
-    sessionStorage.setItem('pdfQuestions', JSON.stringify(questionsResult.questions || []))
+    sessionStorage.setItem('pdfQuestions', JSON.stringify(questionsData))
+    console.log('已保存到sessionStorage，题目数:', questionsData.length)
 
     // 完成
+    const questionCount = questionsData.length
+
     result.value = {
       taskId: taskId,
       fileName: file.name,
       pageCount: processResult.pageCount || 0,
-      questionCount: questionsResult.questions?.length || 0
+      questionCount: questionCount
     }
 
-    ElMessage.success('PDF处理完成！可以开始校验了')
+    if (questionCount > 0) {
+      ElMessage.success(`PDF处理完成！识别到 ${questionCount} 道题目，可以开始校验了`)
+    } else {
+      ElMessage.warning('PDF处理完成，但未识别到题目，可能需要调整PDF格式')
+    }
 
   } catch (error: any) {
-    ElMessage.error(error.message || '处理失败，请检查后端服务是否运行')
-    console.error('PDF处理错误:', error)
+    console.error('PDF处理完整错误:', error)
+    console.error('错误详情:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    })
+
+    ElMessage.error(`处理失败: ${error.response?.data?.detail || error.message || '未知错误'}`)
   } finally {
     processing.value = false
   }
+}
+
+// 测试功能：创建模拟数据
+const createMockData = () => {
+  console.log('[创建测试数据] 开始')
+
+  const mockQuestions = [
+    {
+      questionNumber: 1,
+      rawText: '计算：$\\sin(30^\\circ) = ?$',
+      options: [
+        { letter: 'A', content: '$\\frac{1}{2}$' },
+        { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
+        { letter: 'C', content: '$\\frac{\\sqrt{3}}{2}$' },
+        { letter: 'D', content: '1' }
+      ],
+      hasFormula: true,
+      answer: 'A',
+      type: 'choice',
+      difficulty: 'L1',
+      knowledgePoints: ['三角函数', '特殊值'],
+      solution: '$\\sin(30^\\circ) = \\frac{1}{2}$',
+      imageUrl: 'https://via.placeholder.com/600x400?text=Question+1',
+      topic: '三角函数'
+    },
+    {
+      questionNumber: 2,
+      rawText: '计算：$\\cos(45^\\circ) = ?$',
+      options: [
+        { letter: 'A', content: '$\\frac{1}{2}$' },
+        { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
+        { letter: 'C', content: '$\\frac{\\sqrt{3}}{2}$' },
+        { letter: 'D', content: '1' }
+      ],
+      hasFormula: true,
+      answer: 'B',
+      type: 'choice',
+      difficulty: 'L1',
+      knowledgePoints: ['三角函数', '特殊值'],
+      solution: '$\\cos(45^\\circ) = \\frac{\\sqrt{2}}{2}$',
+      imageUrl: 'https://via.placeholder.com/600x400?text=Question+2',
+      topic: '三角函数'
+    }
+  ]
+
+  const jsonString = JSON.stringify(mockQuestions)
+  console.log('[创建测试数据] 题目数量:', mockQuestions.length)
+  console.log('[创建测试数据] JSON长度:', jsonString.length)
+
+  // 保存到sessionStorage
+  sessionStorage.setItem('pdfTaskId', 'mock_' + Date.now())
+  sessionStorage.setItem('pdfQuestions', jsonString)
+
+  // 验证保存
+  const saved = sessionStorage.getItem('pdfQuestions')
+  console.log('[创建测试数据] 保存验证:', saved ? '成功' : '失败')
+  console.log('[创建测试数据] 保存的数据长度:', saved?.length)
+
+  result.value = {
+    taskId: 'mock',
+    fileName: '测试数据.pdf',
+    pageCount: 1,
+    questionCount: mockQuestions.length
+  }
+
+  ElMessage.success('已创建测试数据，点击"开始校验题目"按钮')
 }
 
 const simulateProgress = (start: number, end: number, duration: number) => {
@@ -217,7 +331,24 @@ const simulateProgress = (start: number, end: number, duration: number) => {
 }
 
 const startReview = () => {
-  router.push('/pdf-review')
+  console.log('[跳转] 开始跳转到校验页面')
+  console.log('[跳转] 当前路由:', router.currentRoute.value.path)
+
+  // 验证数据
+  const data = sessionStorage.getItem('pdfQuestions')
+  console.log('[跳转] sessionStorage数据长度:', data?.length)
+
+  if (!data) {
+    ElMessage.warning('没有数据，请先创建测试数据或上传PDF')
+    return
+  }
+
+  // 跳转
+  router.push('/pdf-review').then(() => {
+    console.log('[跳转] 跳转成功')
+  }).catch(err => {
+    console.error('[跳转] 跳转失败:', err)
+  })
 }
 
 // 延迟函数
@@ -228,16 +359,27 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 .pdf-import-page {
   max-width: 1000px;
   margin: 0 auto;
+  height: 100%;
+  overflow: hidden;
 }
 
 :deep(.el-upload-dragger) {
-  padding: 60px 20px;
+  padding: 40px 20px;
 }
 
 .el-icon--upload {
-  font-size: 67px;
+  font-size: 50px;
   color: #409eff;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+/* 压缩使用指南高度 */
+:deep(.el-timeline-item__content) {
+  padding-bottom: 10px;
+}
+
+:deep(.el-card) {
+  margin-bottom: 15px;
 }
 </style>
 

@@ -42,8 +42,8 @@ const router = createRouter({
         {
           path: '/pdf-review',
           name: 'pdf-review',
-          component: () => import('../views/PDFReview.vue'),
-          meta: { title: 'PDF校验', icon: 'View', hidden: true }
+          component: () => import('../views/PDFReviewSimple.vue'),
+          meta: { title: 'PDF校验', icon: 'View' }
         },
         {
           path: '/settings',

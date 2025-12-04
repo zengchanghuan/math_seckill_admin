@@ -1,8 +1,25 @@
 <template>
   <div class="pdf-review-page">
+    <!-- 调试信息（详细） -->
+    <el-alert type="warning" :closable="false" style="margin-bottom: 10px;">
+      <strong>调试信息：</strong><br/>
+      questions数组: {{ questions.length }} 项<br/>
+      totalQuestions计算值: {{ totalQuestions }}<br/>
+      currentIndex: {{ currentIndex }}<br/>
+      是否显示内容: {{ totalQuestions > 0 ? '是' : '否' }}<br/>
+      <div v-if="questions.length > 0" style="margin-top: 5px;">
+        第一题预览: {{ questions[0]?.questionNumber }}. {{ questions[0]?.rawText?.substring(0, 30) }}...
+      </div>
+    </el-alert>
+
     <!-- 进度指示 -->
-    <el-card class="progress-card">
-      <div class="review-progress">
+    <el-card class="progress-card" v-if="totalQuestions > 0">
+      <el-alert type="success" :closable="false">
+        <template #title>
+          ✅ 已加载 {{ totalQuestions }} 道待校验题目
+        </template>
+      </el-alert>
+      <div class="review-progress" style="margin-top: 15px;">
         <span>校验进度：{{ currentIndex + 1 }} / {{ totalQuestions }}</span>
         <el-progress
           :percentage="reviewPercentage"
@@ -13,7 +30,8 @@
     </el-card>
 
     <!-- 左右对比区域 -->
-    <el-row :gutter="20" style="margin-top: 20px;">
+    <template v-if="totalQuestions > 0">
+      <el-row :gutter="20" style="margin-top: 20px;">
       <!-- 左侧：原始图片 -->
       <el-col :span="12">
         <el-card>
@@ -137,39 +155,57 @@
           </el-form>
         </el-card>
       </el-col>
-    </el-row>
+      </el-row>
 
-    <!-- 底部操作栏 -->
-    <el-card style="margin-top: 20px;" v-if="currentQuestion">
-      <div class="action-bar">
-        <el-button
-          :disabled="currentIndex === 0"
-          @click="previousQuestion"
-        >
-          <el-icon><ArrowLeft /></el-icon>
-          上一题
-        </el-button>
-
-        <el-space>
-          <el-button type="warning" @click="skipQuestion">
-            跳过此题
+      <!-- 底部操作栏 -->
+      <el-card style="margin-top: 20px;">
+        <div class="action-bar">
+          <el-button
+            :disabled="currentIndex === 0"
+            @click="previousQuestion"
+          >
+            <el-icon><ArrowLeft /></el-icon>
+            上一题
           </el-button>
-          <el-button type="success" @click="saveQuestion">
-            <el-icon><Check /></el-icon>
-            保存此题
-          </el-button>
-        </el-space>
 
-        <el-button
-          type="primary"
-          :disabled="currentIndex >= totalQuestions - 1"
-          @click="nextQuestion"
-        >
-          下一题
-          <el-icon><ArrowRight /></el-icon>
-        </el-button>
-      </div>
-    </el-card>
+          <el-space>
+            <el-button type="warning" @click="skipQuestion">
+              跳过此题
+            </el-button>
+            <el-button type="success" @click="saveQuestion">
+              <el-icon><Check /></el-icon>
+              保存此题
+            </el-button>
+          </el-space>
+
+          <el-button
+            type="primary"
+            :disabled="currentIndex >= totalQuestions - 1"
+            @click="nextQuestion"
+          >
+            下一题
+            <el-icon><ArrowRight /></el-icon>
+          </el-button>
+        </div>
+      </el-card>
+    </template>
+
+    <!-- 空状态 -->
+    <template v-else>
+      <el-card style="margin-top: 20px;">
+        <el-empty description="没有待校验的题目">
+          <el-space>
+            <el-button type="success" @click="createTestDataHere">
+              <el-icon><MagicStick /></el-icon>
+              创建测试数据
+            </el-button>
+            <el-button type="primary" @click="router.push('/pdf-import')">
+              返回PDF导入
+            </el-button>
+          </el-space>
+        </el-empty>
+      </el-card>
+    </template>
   </div>
 </template>
 
@@ -183,7 +219,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  View
+  View,
+  MagicStick
 } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import MathFormula from '../components/MathFormula.vue'
@@ -204,7 +241,12 @@ const questions = ref<any[]>([])
 const currentIndex = ref(0)
 const zoom = ref(1)
 
-const totalQuestions = computed(() => questions.value.length)
+// 强制响应式
+const totalQuestions = computed(() => {
+  const count = questions.value?.length || 0
+  console.log('[计算] totalQuestions:', count)
+  return count
+})
 const reviewPercentage = computed(() => {
   if (totalQuestions.value === 0) return 0
   return Math.round((currentIndex.value / totalQuestions.value) * 100)
@@ -305,11 +347,82 @@ const saveQuestion = async () => {
   }
 }
 
+// 直接在校验页面创建测试数据
+const createTestDataHere = () => {
+  const mockQuestions = [
+    {
+      questionNumber: 1,
+      rawText: '计算：$\\sin(30^\\circ) = ?$',
+      options: [
+        { letter: 'A', content: '$\\frac{1}{2}$' },
+        { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
+        { letter: 'C', content: '$\\frac{\\sqrt{3}}{2}$' },
+        { letter: 'D', content: '1' }
+      ],
+      hasFormula: true,
+      answer: 'A',
+      type: 'choice',
+      difficulty: 'L1',
+      knowledgePoints: ['三角函数', '特殊值'],
+      solution: '$\\sin(30^\\circ) = \\frac{1}{2}$',
+      imageUrl: 'https://via.placeholder.com/600x400?text=Question+1',
+      topic: '三角函数'
+    },
+    {
+      questionNumber: 2,
+      rawText: '计算：$\\cos(45^\\circ) = ?$',
+      options: [
+        { letter: 'A', content: '$\\frac{1}{2}$' },
+        { letter: 'B', content: '$\\frac{\\sqrt{2}}{2}$' },
+        { letter: 'C', content: '$\\frac{\\sqrt{3}}{2}$' },
+        { letter: 'D', content: '1' }
+      ],
+      hasFormula: true,
+      answer: 'B',
+      type: 'choice',
+      difficulty: 'L1',
+      knowledgePoints: ['三角函数', '特殊值'],
+      solution: '$\\cos(45^\\circ) = \\frac{\\sqrt{2}}{2}$',
+      imageUrl: 'https://via.placeholder.com/600x400?text=Question+2',
+      topic: '三角函数'
+    }
+  ]
+
+  // 保存并立即加载
+  sessionStorage.setItem('pdfQuestions', JSON.stringify(mockQuestions))
+  questions.value = mockQuestions
+
+  console.log('[PDFReview] 测试数据已创建，题目数:', mockQuestions.length)
+  ElMessage.success('测试数据已加载！')
+}
+
 onMounted(() => {
+  console.log('[PDFReview] onMounted开始')
+
   // 从sessionStorage加载题目数据
   const savedQuestions = sessionStorage.getItem('pdfQuestions')
-  if (savedQuestions) {
-    questions.value = JSON.parse(savedQuestions)
+  console.log('[PDFReview] savedQuestions:', savedQuestions ? '有数据' : '无数据')
+
+  if (savedQuestions && savedQuestions !== 'undefined' && savedQuestions !== 'null') {
+    try {
+      const parsed = JSON.parse(savedQuestions)
+      console.log('[PDFReview] 解析结果:', parsed)
+
+      // 强制更新
+      questions.value = []
+      setTimeout(() => {
+        questions.value = Array.isArray(parsed) ? parsed : []
+        console.log('[PDFReview] 题目已设置:', questions.value.length, '道')
+        console.log('[PDFReview] 第一题:', questions.value[0])
+      }, 50)
+
+    } catch (error) {
+      console.error('[PDFReview] 解析失败:', error)
+      questions.value = []
+    }
+  } else {
+    console.warn('[PDFReview] sessionStorage中没有有效数据')
+    questions.value = []
   }
 })
 
@@ -368,6 +481,16 @@ onMounted(() => {
   align-items: flex-start;
   background: #f5f7fa;
   border-radius: 4px;
+}
+
+/* 右侧表单区域 - 移除滚动条 */
+:deep(.el-form) {
+  max-height: none;
+  overflow: visible;
+}
+
+:deep(.el-card__body) {
+  overflow: visible;
 }
 
 .pdf-image {
