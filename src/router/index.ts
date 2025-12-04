@@ -72,6 +72,19 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/exam-paper-2022',
+                    name: 'exam-paper-2022',
+                    component: () => import('../views/ExamPaper2022.vue'),
+                    meta: {
+                        title: '2022年广东专升本试卷',
+                        icon: 'Document',
+                        parent: '题库',
+                        parentGroup: '2022年',
+                        order: 2022,
+                        isPaper: true
+                    }
+                },
+                {
                     path: '/settings',
                     name: 'settings',
                     component: () => import('../views/Settings.vue'),
