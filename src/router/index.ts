@@ -85,6 +85,19 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/exam-answer-2022',
+                    name: 'exam-answer-2022',
+                    component: () => import('../views/ExamAnswer2022.vue'),
+                    meta: {
+                        title: '2022年广东专升本答案',
+                        icon: 'Tickets',
+                        parent: '题库',
+                        parentGroup: '2022年',
+                        order: 2022,
+                        isAnswer: true
+                    }
+                },
+                {
                     path: '/settings',
                     name: 'settings',
                     component: () => import('../views/Settings.vue'),
